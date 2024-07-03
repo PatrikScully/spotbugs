@@ -20,17 +20,17 @@ Currently the versioning policy of this project follows [Semantic Versioning v2.
 - Fix FP `EI_EXPOSE_REP` when there are multiple immutable assignments ([#3023](https://github.com/spotbugs/spotbugs/issues/3023))
 - Fixed false positive `NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR` for Kotlin, handle Kotlin's `Intrinsics.checkNotNullParameter()` ([#3094](https://github.com/spotbugs/spotbugs/issues/3094))
 
+### Added
+- New detector `AtomicOperationsCombinedDetector` and introduced new bug types:
+  - `AT_COMBINED_ATOMIC_OPERATIONS_ARE_NOT_ATOMIC` is reported in case of combined atomic operations are not synchronized.
+  - `AT_ATOMIC_OPERATION_NEEDS_SYNCHRONIZATION` is reported when an atomic operation is not synchronized, but should be because of thread safety.
+
 ## 4.8.6 - 2024-06-17
 ### Fixed
 - Do not report BC_UNCONFIRMED_CAST for Java 21's type switches when the switch instruction is TABLESWITCH ([#2782](https://github.com/spotbugs/spotbugs/issues/2782))
 - Do not throw exception when inspecting empty switch statements ([#2995](https://github.com/spotbugs/spotbugs/issues/2995))
 - Adjust priority since relaxed mode reports even `IGNORED_PRIORITY` ([#2994](https://github.com/spotbugs/spotbugs/issues/2994))
 - Fix duplicated log4j2 jar in distribution ([#3001](https://github.com/spotbugs/spotbugs/issues/3001))
-
-### Added
-- New detector `AtomicOperationsCombinedDetector` and introduced new bug types:
-  - `AT_COMBINED_ATOMIC_OPERATIONS_ARE_NOT_ATOMIC` is reported in case of combined atomic operations are not synchronized.
-  - `AT_ATOMIC_OPERATION_NEEDS_SYNCHRONIZATION` is reported when an atomic operation is not synchronized, but should be because of thread safety.
 
 ## 4.8.5 - 2024-05-03
 ### Fixed
