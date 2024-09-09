@@ -94,25 +94,30 @@ public class ResourceInMultipleThreadsDetector extends OpcodeStackDetector {
 
         if (firstPass) {
             collectMethodsUsedInThreads(seen);
-        } else {
+        } /*else {
             try {
                 collectFieldsUsedInThreads(seen);
             } catch (CheckedAnalysisException e) {
                 bugReporter.logError(String.format("Detector %s caught exception while analyzing class %s", getClass().getName(), getClassName()), e);
             }
-        }
+        }*/
     }
 
     private void collectMethodsUsedInThreads(int seen) {
         if (seen == Const.INVOKEDYNAMIC && getStack().getStackDepth() > 1
                 && "Ljava/lang/Thread;".equals(getStack().getStackItem(1).getSignature())
                 && !isJavaRuntimeMethod()) {
-            getMethodFromBootstrap(getThisClass(), (ConstantInvokeDynamic) getConstantRefOperand()).ifPresent(methodsUsedInThreads::add);
-        } else if ((seen == Const.INVOKEVIRTUAL || seen == Const.INVOKEINTERFACE || seen == Const.INVOKESPECIAL || seen == Const.INVOKESTATIC)
+            getMethodFromBootstrap(getThisClass(), (ConstantInvokeDynamic) getConstantRefOperand()).ifPresent(methodDescriptor -> {
+                BugInstance bug = new BugInstance(this, "AT_UNSAFE_RESOURCE_ACCESS_IN_THREAD", LOW_PRIORITY)
+                        .addClass(this)
+                        .addMethod(methodDescriptor);
+                bugReporter.reportBug(bug);
+            });
+        } /*else if ((seen == Const.INVOKEVIRTUAL || seen == Const.INVOKEINTERFACE || seen == Const.INVOKESPECIAL || seen == Const.INVOKESTATIC)
                 && getXMethodOperand() != null && methodsUsedInThreads.contains(getMethodDescriptor())
                 && getClassDescriptor().equals(getXMethodOperand().getClassDescriptor())) {
             methodsUsedInThreads.add(getMethodDescriptorOperand());
-        }
+        }*/
     }
 
     /**
@@ -187,12 +192,12 @@ public class ResourceInMultipleThreadsDetector extends OpcodeStackDetector {
 
     @Override
     public void visitAfter(JavaClass javaClass) {
-        super.visit(javaClass);
-        fieldsUsedInThreads.entrySet().stream()
-                .filter(entry -> isBug(entry.getValue()))
-                .flatMap(entry -> entry.getValue().methodBugs.values().stream().flatMap(Set::stream))
-                .collect(Collectors.toSet())
-                .forEach(bugReporter::reportBug);
+        //super.visit(javaClass);
+        //fieldsUsedInThreads.entrySet().stream()
+        //        .filter(entry -> isBug(entry.getValue()))
+        //        .flatMap(entry -> entry.getValue().methodBugs.values().stream().flatMap(Set::stream))
+        //        .collect(Collectors.toSet())
+        //        .forEach(bugReporter::reportBug);
     }
 
     /**
