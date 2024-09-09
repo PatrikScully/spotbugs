@@ -119,12 +119,12 @@ public class AtomicOperationsCombinedDetector implements Detector {
             for (Method method : classContext.getMethodsInCallOrder()) {
                 collectFieldsForAtomicityCheck(classContext, method);
             }
-            for (Method method : classContext.getMethodsInCallOrder()) {
-                analyzeFieldsForAtomicityViolations(classContext, method);
-            }
-            removePresynchronizedPrivateMethodCalls();
-            accumulateFieldsForAtomicityAnalysis();
-            accumulateLocalVariables();
+            //for (Method method : classContext.getMethodsInCallOrder()) {
+            //    analyzeFieldsForAtomicityViolations(classContext, method);
+            //}
+            //removePresynchronizedPrivateMethodCalls();
+            //accumulateFieldsForAtomicityAnalysis();
+            //accumulateLocalVariables();
         } catch (CheckedAnalysisException e) {
             bugReporter.logError(String.format("Detector %s caught exception while analyzing class %s",
                     getClass().getName(), classContext.getJavaClass().getClassName()), e);
@@ -145,7 +145,11 @@ public class AtomicOperationsCombinedDetector implements Detector {
                 OpcodeStack stack = OpcodeStackScanner.getStackAt(classContext.getJavaClass(), method, handle.getPosition());
                 OpcodeStack.Item stackItem = stack.getStackItem(0);
                 if (isAtomicField(stackItem.getReturnValueOf())) {
-                    fieldsForAtomicityCheck.add(XFactory.createXField((FieldInstruction) instruction, cpg));
+                    //fieldsForAtomicityCheck.add(XFactory.createXField((FieldInstruction) instruction, cpg));
+                    BugPrototype bugPrototype = new BugPrototype(classContext, method, location);
+                    bugPrototype.invokedField = XFactory.createXField((FieldInstruction) instruction, cpg);
+                    BugInstance bugInstance = bugPrototype.toBugInstance(this, "AT_COMBINED_ATOMIC_OPERATIONS_ARE_NOT_ATOMIC");
+                    bugAccumulator.accumulateBug(bugInstance, bugInstance.getPrimarySourceLineAnnotation());
                 }
             }
         }
